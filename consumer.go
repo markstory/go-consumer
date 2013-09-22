@@ -14,6 +14,7 @@ func makeAmqpUrl(config *conf.ConfigFile) string {
 		"vhost": "/",
 		"user": "guest",
 		"password": "guest",
+		"port": "5672",
 	}
 	for key, _ := range options {
 		if config.HasOption("connection", key) {
