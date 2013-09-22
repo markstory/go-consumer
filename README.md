@@ -53,5 +53,3 @@ or nacked as you see fit.
 
 GoConsumer handles SIGKILL and SIGQUIT. In both cases the process will be terminated
 once the client buffers have drained and message processing is complete.
-
->>>>>>> Start a README.
