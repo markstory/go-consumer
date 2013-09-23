@@ -81,6 +81,31 @@ func newExchange(config *conf.ConfigFile) (ex exchange, err error) {
 Create a queue from the config file.
 */
 func newQueue(config *conf.ConfigFile) (q queue, err error) {
+	if !config.HasSection("queue") {
+		return q, fmt.Errorf("Missing queue section in configuration file.")
+	}
+	if _, err := config.GetString("queue", "name"); err != nil {
+		return q, fmt.Errorf("Missing name from queue section.")
+	}
+	name, _ := config.GetString("queue", "name")
+	durable := true
+	if config.HasOption("queue", "durable") {
+		durable, _ = config.GetBool("queue", "durable")
+	}
+	autoDelete := false
+	if config.HasOption("queue", "autoDelete") {
+		autoDelete, _ = config.GetBool("queue", "autoDelete")
+	}
+	exclusive := true
+	if config.HasOption("queue", "exclusive") {
+		durable, _ = config.GetBool("queue", "durable")
+	}
+	q = queue{
+		name: name,
+		durable: durable,
+		autoDelete: autoDelete,
+		exclusive: exclusive,
+	}
 	return
 }
 

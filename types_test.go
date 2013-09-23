@@ -79,3 +79,67 @@ autoDelete = true
 		t.Error("autoDelete is wrong")
 	}
 }
+
+
+func TestNewQueueError(t *testing.T) {
+	c := newConfig("")
+	_, err := newQueue(c)
+	if err == nil {
+		t.Error("Missing queue section should cause an error.")
+	}
+}
+
+func TestNewQueueNoNameError(t *testing.T) {
+	ini := `
+[queue]
+`
+	c := newConfig(ini)
+	_, err := newQueue(c)
+	if err == nil {
+		t.Error("Should fail on missing name.")
+	}
+}
+
+func TestNewQueueDefaults(t *testing.T) {
+	ini := `
+[queue]
+name = test
+`
+	c := newConfig(ini)
+	q, err := newQueue(c)
+	if err != nil {
+		t.Error("Should not make an error")
+	}
+	if q.name != "test" {
+		t.Error("name does not match")
+	}
+	if q.durable != true {
+		t.Error("durable should default to true")
+	}
+	if q.autoDelete != false {
+		t.Error("autoDelete should default to false")
+	}
+}
+
+func TestNewQueueValues(t *testing.T) {
+	ini := `
+[queue]
+name = test
+durable = false
+autoDelete = true
+`
+	c := newConfig(ini)
+	q, err := newQueue(c)
+	if err != nil {
+		t.Error("Should not make an error")
+	}
+	if q.name != "test" {
+		t.Error("name does not match")
+	}
+	if q.durable != false {
+		t.Error("durable is wrong")
+	}
+	if q.autoDelete != true {
+		t.Error("autoDelete is wrong")
+	}
+}
