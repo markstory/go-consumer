@@ -29,10 +29,32 @@ func makeAmqpUrl(config *conf.ConfigFile) string {
 		options["vhost"])
 }
 
+/*
+Create the amqp.Connection based on the config file.
+*/
+func connect(config *conf.ConfigFile) (*amqp.Connection, error) {
+	amqpUrl := makeAmqpUrl(config)
+	return amqp.Dial(amqpUrl)
+}
 
-// Create a new consumer using the connection, exchange
-// binding and queue configurations in the provide configuration
-// file. Once created you can bind consumers to start handling messages
+/*
+Declare the exchange based on the config file.
+*/
+func bind(config *conf.ConfigFile, conn *amqp.Connection) (error) {
+	/* channel, err := conn.Channel()*/
+	/* if err != nil {*/
+	/*     return err*/
+	/* }*/
+	//ex, q, bind, err = readConfigFile(config)
+	return nil
+}
+
+
+/*
+Create a new consumer using the connection, exchange
+binding and queue configurations in the provide configuration
+file. Once created you can bind consumers to start handling messages
+*/
 func Create(configFile string) (c *Consumer, err error) {
 	log.Printf("Creating new consumer for config file: %s", configFile)
 
@@ -41,14 +63,7 @@ func Create(configFile string) (c *Consumer, err error) {
 		return
 	}
 
-	amqpUrl := makeAmqpUrl(config)
-	conn, err := amqp.Dial(amqpUrl)
-	if err != nil {
-		return
-	}
-
 	c = &Consumer{
-		conn: conn,
 		conf: config,
 	}
 
@@ -57,19 +72,53 @@ func Create(configFile string) (c *Consumer, err error) {
 
 type worker func(amqp.Delivery)
 
-// The main type that users of this package interact with
-//
+/*
+A consumer that applications use to register
+functions to act as consumers.
+
+Consumers will connect to the AMQP server when the Consume
+method is called. You can manualy connect using the Connect
+method as well.
+
+*/
 type Consumer struct {
-	conn *amqp.Connection
 	conf *conf.ConfigFile
+	conn *amqp.Connection
+	connected bool
 }
 
-// Takes a function that accepts amqp.Delivery and binds
-// it to the configured queue.
-//
-// The provided function will be called each time a message is
-// received and the function is expected to Ack or Nack the message.
-//
+/*
+Connect to the AMQP server.
+
+Will do the following work:
+
+- Create the connection
+- Declare the exhange
+- Declare the queue
+- Bind the queue + exchange together.
+*/
+func (c *Consumer) Connect() (ok bool, err error) {
+	if c.connected {
+		return true, err
+	}
+
+	conn, err := connect(c.conf)
+	if err != nil {
+		return
+	}
+	c.conn = conn
+
+	return
+}
+
+/*
+Takes a function that accepts amqp.Delivery and binds
+it to the configured queue.
+
+The provided function will be called each time a message is
+received and the function is expected to Ack or Nack the message.
+*/
 func (c *Consumer) Consume(worker) (ok bool, err error) {
 	return
 }
+
