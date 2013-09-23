@@ -1,8 +1,8 @@
 package consumer
 
 import (
-	"testing"
 	"code.google.com/p/goconf/conf"
+	"testing"
 )
 
 const configFile = `
@@ -35,6 +35,3 @@ func TestCreateMissingFile(t *testing.T) {
 		t.Error("Should fail no file")
 	}
 }
-
-
-

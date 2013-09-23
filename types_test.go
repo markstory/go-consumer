@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func newConfig(content string) (*conf.ConfigFile) {
+func newConfig(content string) *conf.ConfigFile {
 	config, _ := conf.ReadConfigBytes([]byte(content))
 	return config
 }
@@ -79,7 +79,6 @@ autoDelete = true
 		t.Error("autoDelete is wrong")
 	}
 }
-
 
 func TestNewQueueError(t *testing.T) {
 	c := newConfig("")

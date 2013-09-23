@@ -1,20 +1,20 @@
 package consumer
 
 import (
-	"github.com/streadway/amqp"
 	"code.google.com/p/goconf/conf"
-	"log"
 	"fmt"
+	"github.com/streadway/amqp"
+	"log"
 )
 
 // Create the amqp:// url from the config file.
 func makeAmqpUrl(config *conf.ConfigFile) string {
 	options := map[string]string{
-		"host": "localhost",
-		"vhost": "/",
-		"user": "guest",
+		"host":     "localhost",
+		"vhost":    "/",
+		"user":     "guest",
 		"password": "guest",
-		"port": "5672",
+		"port":     "5672",
 	}
 	for key, _ := range options {
 		if config.HasOption("connection", key) {
@@ -40,7 +40,7 @@ func connect(config *conf.ConfigFile) (*amqp.Connection, error) {
 /*
 Declare the exchange based on the config file.
 */
-func bind(config *conf.ConfigFile, conn *amqp.Connection) (error) {
+func bind(config *conf.ConfigFile, conn *amqp.Connection) error {
 	/* channel, err := conn.Channel()*/
 	/* if err != nil {*/
 	/*     return err*/
@@ -48,7 +48,6 @@ func bind(config *conf.ConfigFile, conn *amqp.Connection) (error) {
 	//ex, q, bind, err = readConfigFile(config)
 	return nil
 }
-
 
 /*
 Create a new consumer using the connection, exchange
@@ -82,8 +81,8 @@ method as well.
 
 */
 type Consumer struct {
-	conf *conf.ConfigFile
-	conn *amqp.Connection
+	conf      *conf.ConfigFile
+	conn      *amqp.Connection
 	connected bool
 }
 
@@ -121,4 +120,3 @@ received and the function is expected to Ack or Nack the message.
 func (c *Consumer) Consume(worker) (ok bool, err error) {
 	return
 }
-

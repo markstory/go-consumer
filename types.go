@@ -1,28 +1,28 @@
 package consumer
 
 import (
-	"fmt"
 	"code.google.com/p/goconf/conf"
+	"fmt"
 )
 
 type exchange struct {
-	name string
-	kind string
-	durable bool
+	name       string
+	kind       string
+	durable    bool
 	autoDelete bool
 }
 
 type binding struct {
-	exchange string
-	queue string
+	exchange   string
+	queue      string
 	routingKey string
 }
 
 type queue struct {
-	name string
-	durable bool
+	name       string
+	durable    bool
 	autoDelete bool
-	exclusive bool
+	exclusive  bool
 }
 
 /*
@@ -43,7 +43,6 @@ func readConfigFile(config *conf.ConfigFile) (ex exchange, q queue, bind binding
 	}
 	return
 }
-
 
 /*
 Create an exchange from the config file.
@@ -69,9 +68,9 @@ func newExchange(config *conf.ConfigFile) (ex exchange, err error) {
 		autoDelete, _ = config.GetBool("exchange", "autoDelete")
 	}
 	ex = exchange{
-		name: name,
-		kind: kind,
-		durable: durable,
+		name:       name,
+		kind:       kind,
+		durable:    durable,
 		autoDelete: autoDelete,
 	}
 	return
@@ -101,10 +100,10 @@ func newQueue(config *conf.ConfigFile) (q queue, err error) {
 		durable, _ = config.GetBool("queue", "durable")
 	}
 	q = queue{
-		name: name,
-		durable: durable,
+		name:       name,
+		durable:    durable,
 		autoDelete: autoDelete,
-		exclusive: exclusive,
+		exclusive:  exclusive,
 	}
 	return
 }
