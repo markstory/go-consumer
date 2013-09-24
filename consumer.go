@@ -41,11 +41,23 @@ func connect(config *conf.ConfigFile) (*amqp.Connection, error) {
 Declare the exchange based on the config file.
 */
 func bind(config *conf.ConfigFile, conn *amqp.Connection) error {
-	/* channel, err := conn.Channel()*/
-	/* if err != nil {*/
-	/*     return err*/
-	/* }*/
-	//ex, q, err = readConfigFile(config)
+	channel, err := conn.Channel()
+	if err != nil {
+		return err
+	}
+	ex, q, err := readConfigFile(config)
+	err = channel.ExchangeDeclare(ex.name, ex.kind, ex.durable, ex.autoDelete, false, false, nil)
+	if err != nil {
+		return err
+	}
+	_, err = channel.QueueDeclare(q.name, q.durable, q.autoDelete, q.exclusive, false, nil)
+	if err != nil {
+		return err
+	}
+	err = channel.QueueBind(q.name, q.routingKey, ex.name, false, nil)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -105,8 +117,12 @@ func (c *Consumer) Connect() (ok bool, err error) {
 	if err != nil {
 		return
 	}
-	c.conn = conn
 
+	err = bind(c.conf, c.conn)
+	if err != nil {
+		return
+	}
+	c.conn = conn
 	return
 }
 
