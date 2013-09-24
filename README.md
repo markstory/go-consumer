@@ -28,25 +28,32 @@ can attach your consumer function in. The following is an example config file:
 	durable = True
 	auto_delete = False
 
-	[binding]
-	queue = hose
-	exchange = grand
-	routing_key = fire
-
 	[queue]
 	name = hose
 	durable = True
 	auto_delete = True
 	exclusive = False
+	routing_key = fire
 
-Once you've started your program you can attach your consumer:
+Consuming functions need to have the following signature:
+
+	func(*consumer.Message)
+
+A simple example application would look like:
 
 	import (
 		"github.com/markstory/go-consumer"
+		"log"
 	)
 
-	c = consumer.LoadConfig("./consumer.ini")
-	c.BindConsumer(MyFunc)
+	c, err = consumer.LoadConfig("./consumer.ini")
+	if err != nil {
+		log.Fatalf("Unable to create consumer. Error: %v", err)
+	}
+	c.Consume(func(msg *consumer.Message) {
+		log.Print("Got a message")
+		msg.Ack(true)
+	})
 
 Your consumer function will receive message types that can be acked
 or nacked as you see fit.
