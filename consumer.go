@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/streadway/amqp"
 	"log"
+	"os"
+	"os/signal"
 )
 
 // Create the amqp:// url from the config file.
@@ -95,6 +97,7 @@ method as well.
 type Consumer struct {
 	conf      *conf.ConfigFile
 	conn      *amqp.Connection
+	channel   *amqp.Channel
 	queue     queue
 	connected bool
 }
@@ -123,7 +126,7 @@ func (c *Consumer) Connect() (err error) {
 		return
 	}
 
-	q, err := bind(c.conf, c.conn)
+	q, err := bind(c.conf, conn)
 	if err != nil {
 		return
 	}
@@ -152,27 +155,34 @@ func (c *Consumer) Consume(handler worker) (err error) {
 		return
 	}
 
-	go func() {
-		for rawMsg := range messages {
-			msg := &Message{rawMsg}
-			handler(msg)
-		}
-	}()
-
-	c.SetupSignals()
-
+	go c.process(handler, messages)
+	c.StartLoop()
 	return
 }
 
+/*
+Consumer from the channel - run inside a separate goroutine
+*/
+func (c *Consumer) process(handler worker, messages <-chan amqp.Delivery) {
+	for rawMsg := range messages {
+		msg := &Message{rawMsg}
+		handler(msg)
+	}
+}
 
 /*
-Register the signal handlers for this process.
-
-SIGKILL - 
-SIGQUIT - 
-
+Start the loop that keeps the process alive and listening to OS signals.
 */
-func (c *Consumer) SetupSignals() {
+func (c *Consumer) StartLoop() {
+	kill := make(chan os.Signal, 1)
+
+	// Listen for os.Kill
+	signal.Notify(kill, os.Kill)
+
+	select {
+	case <-kill:
+		log.Fatal("Process killed")
+	}
 }
 
 
