@@ -50,7 +50,7 @@ A simple example application would look like:
 	if err != nil {
 		log.Fatalf("Unable to create consumer. Error: %v", err)
 	}
-	c.Consume(func(msg *consumer.Message) {
+	err = c.Consume(func(msg *consumer.Message) {
 		log.Print("Got a message")
 		msg.Ack(true)
 	})
