@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func newConfig(content string) *conf.ConfigFile {
+func newConfig(content string) (*conf.ConfigFile) {
 	config, _ := conf.ReadConfigBytes([]byte(content))
 	return config
 }
@@ -59,7 +59,7 @@ func TestNewExchangeValues(t *testing.T) {
 name = test
 type = fanout
 durable = false
-autoDelete = true
+auto_delete = true
 `
 	c := newConfig(ini)
 	ex, err := newExchange(c)
@@ -79,6 +79,7 @@ autoDelete = true
 		t.Error("autoDelete is wrong")
 	}
 }
+
 
 func TestNewQueueError(t *testing.T) {
 	c := newConfig("")
@@ -118,6 +119,9 @@ name = test
 	if q.autoDelete != false {
 		t.Error("autoDelete should default to false")
 	}
+	if q.routingKey != "" {
+		t.Error("routingKey should default to ''")
+	}
 }
 
 func TestNewQueueValues(t *testing.T) {
@@ -125,7 +129,9 @@ func TestNewQueueValues(t *testing.T) {
 [queue]
 name = test
 durable = false
-autoDelete = true
+auto_delete = true
+routing_key = fire
+exclusive = false
 `
 	c := newConfig(ini)
 	q, err := newQueue(c)
@@ -140,5 +146,11 @@ autoDelete = true
 	}
 	if q.autoDelete != true {
 		t.Error("autoDelete is wrong")
+	}
+	if q.exclusive != false {
+		t.Error("exclusive is wrong")
+	}
+	if q.routingKey != "fire" {
+		t.Error("routingKey is wrong")
 	}
 }

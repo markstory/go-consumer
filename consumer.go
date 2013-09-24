@@ -45,7 +45,7 @@ func bind(config *conf.ConfigFile, conn *amqp.Connection) error {
 	/* if err != nil {*/
 	/*     return err*/
 	/* }*/
-	//ex, q, bind, err = readConfigFile(config)
+	//ex, q, err = readConfigFile(config)
 	return nil
 }
 

@@ -12,32 +12,23 @@ type exchange struct {
 	autoDelete bool
 }
 
-type binding struct {
-	exchange   string
-	queue      string
-	routingKey string
-}
-
 type queue struct {
 	name       string
 	durable    bool
 	autoDelete bool
 	exclusive  bool
+	routingKey string
 }
 
 /*
 Convert the configuration file into domain objects
 */
-func readConfigFile(config *conf.ConfigFile) (ex exchange, q queue, bind binding, err error) {
+func readConfigFile(config *conf.ConfigFile) (ex exchange, q queue, err error) {
 	ex, err = newExchange(config)
 	if err != nil {
 		return
 	}
 	q, err = newQueue(config)
-	if err != nil {
-		return
-	}
-	bind, err = newBinding(config)
 	if err != nil {
 		return
 	}
@@ -64,8 +55,8 @@ func newExchange(config *conf.ConfigFile) (ex exchange, err error) {
 		durable, _ = config.GetBool("exchange", "durable")
 	}
 	autoDelete := false
-	if config.HasOption("exchange", "autoDelete") {
-		autoDelete, _ = config.GetBool("exchange", "autoDelete")
+	if config.HasOption("exchange", "auto_delete") {
+		autoDelete, _ = config.GetBool("exchange", "auto_delete")
 	}
 	ex = exchange{
 		name:       name,
@@ -92,25 +83,23 @@ func newQueue(config *conf.ConfigFile) (q queue, err error) {
 		durable, _ = config.GetBool("queue", "durable")
 	}
 	autoDelete := false
-	if config.HasOption("queue", "autoDelete") {
-		autoDelete, _ = config.GetBool("queue", "autoDelete")
+	if config.HasOption("queue", "auto_delete") {
+		autoDelete, _ = config.GetBool("queue", "auto_delete")
 	}
 	exclusive := true
 	if config.HasOption("queue", "exclusive") {
-		durable, _ = config.GetBool("queue", "durable")
+		exclusive, _ = config.GetBool("queue", "exclusive")
+	}
+	routingKey := ""
+	if config.HasOption("queue", "routing_key") {
+		routingKey, _ = config.GetString("queue", "routing_key")
 	}
 	q = queue{
 		name:       name,
 		durable:    durable,
 		autoDelete: autoDelete,
 		exclusive:  exclusive,
+		routingKey: routingKey,
 	}
-	return
-}
-
-/*
-Create a binding from the config file.
-*/
-func newBinding(config *conf.ConfigFile) (bind binding, err error) {
 	return
 }
