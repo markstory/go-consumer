@@ -40,25 +40,25 @@ func connect(config *conf.ConfigFile) (*amqp.Connection, error) {
 /*
 Declare the exchange based on the config file.
 */
-func bind(config *conf.ConfigFile, conn *amqp.Connection) error {
+func bind(config *conf.ConfigFile, conn *amqp.Connection) (q queue, err error) {
 	channel, err := conn.Channel()
 	if err != nil {
-		return err
+		return
 	}
 	ex, q, err := readConfigFile(config)
 	err = channel.ExchangeDeclare(ex.name, ex.kind, ex.durable, ex.autoDelete, false, false, nil)
 	if err != nil {
-		return err
+		return
 	}
 	_, err = channel.QueueDeclare(q.name, q.durable, q.autoDelete, q.exclusive, false, nil)
 	if err != nil {
-		return err
+		return
 	}
 	err = channel.QueueBind(q.name, q.routingKey, ex.name, false, nil)
 	if err != nil {
-		return err
+		return
 	}
-	return nil
+	return
 }
 
 /*
@@ -81,7 +81,7 @@ func Create(configFile string) (c *Consumer, err error) {
 	return
 }
 
-type worker func(amqp.Delivery)
+type worker func(*Message)
 
 /*
 A consumer that applications use to register
@@ -95,7 +95,12 @@ method as well.
 type Consumer struct {
 	conf      *conf.ConfigFile
 	conn      *amqp.Connection
+	queue     queue
 	connected bool
+}
+
+func (c *Consumer) Queue() queue {
+	return c.queue
 }
 
 /*
@@ -108,9 +113,9 @@ Will do the following work:
 - Declare the queue
 - Bind the queue + exchange together.
 */
-func (c *Consumer) Connect() (ok bool, err error) {
+func (c *Consumer) Connect() (err error) {
 	if c.connected {
-		return true, err
+		return err
 	}
 
 	conn, err := connect(c.conf)
@@ -118,11 +123,12 @@ func (c *Consumer) Connect() (ok bool, err error) {
 		return
 	}
 
-	err = bind(c.conf, c.conn)
+	q, err := bind(c.conf, c.conn)
 	if err != nil {
 		return
 	}
 	c.conn = conn
+	c.queue = q
 	return
 }
 
@@ -133,6 +139,46 @@ it to the configured queue.
 The provided function will be called each time a message is
 received and the function is expected to Ack or Nack the message.
 */
-func (c *Consumer) Consume(worker) (ok bool, err error) {
+func (c *Consumer) Consume(handler worker) (err error) {
+	err = c.Connect()
+	if err != nil {
+		return
+	}
+	channel, err := c.conn.Channel()
+	queue := c.Queue()
+
+	messages, err := channel.Consume(queue.Name(), queue.Tag(), false, queue.Exclusive(), false, false, nil)
+	if err != nil {
+		return
+	}
+
+	go func() {
+		for rawMsg := range messages {
+			msg := &Message{rawMsg}
+			handler(msg)
+		}
+	}()
+
+	c.SetupSignals()
+
 	return
+}
+
+
+/*
+Register the signal handlers for this process.
+
+SIGKILL - 
+SIGQUIT - 
+
+*/
+func (c *Consumer) SetupSignals() {
+}
+
+
+/*
+Simple message type so users of this library don't have to import amqp as well
+*/
+type Message struct {
+	amqp.Delivery
 }

@@ -4,7 +4,6 @@ import (
 	"consumer"
 	"flag"
 	"log"
-	"github.com/streadway/amqp"
 )
 
 func main() {
@@ -20,7 +19,7 @@ func main() {
 // Example worker function
 // Should eventually get type coming out of consumer
 // instead of an amqp.Delivery value.
-func worker (msg amqp.Delivery) {
+func worker (msg *consumer.Message) {
 	log.Printf("msg received")
 	msg.Ack(true)
 }

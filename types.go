@@ -20,6 +20,19 @@ type queue struct {
 	routingKey string
 }
 
+func (q *queue) Name() string {
+	return q.name
+}
+
+func (q *queue) Tag() string {
+	return q.name + "-" + q.routingKey
+}
+
+func (q *queue) Exclusive() bool {
+	return q.exclusive
+}
+
+
 /*
 Convert the configuration file into domain objects
 */
