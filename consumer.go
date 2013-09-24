@@ -48,14 +48,17 @@ func bind(config *conf.ConfigFile, conn *amqp.Connection) (q queue, err error) {
 		return
 	}
 	ex, q, err := readConfigFile(config)
+	log.Printf("Declaring Exchange %s", ex)
 	err = channel.ExchangeDeclare(ex.name, ex.kind, ex.durable, ex.autoDelete, false, false, nil)
 	if err != nil {
 		return
 	}
+	log.Printf("Declaring Queue %s", q)
 	_, err = channel.QueueDeclare(q.name, q.durable, q.autoDelete, q.exclusive, false, nil)
 	if err != nil {
 		return
 	}
+	log.Printf("Declaring Binding %s routingkey=%s", q.name, q.routingKey)
 	err = channel.QueueBind(q.name, q.routingKey, ex.name, false, nil)
 	if err != nil {
 		return
@@ -150,6 +153,7 @@ func (c *Consumer) Consume(handler worker) (err error) {
 	channel, err := c.conn.Channel()
 	queue := c.Queue()
 
+	log.Printf("Consuming from queue: %s", queue.Name())
 	messages, err := channel.Consume(queue.Name(), queue.Tag(), false, queue.Exclusive(), false, false, nil)
 	if err != nil {
 		return
@@ -177,7 +181,7 @@ func (c *Consumer) StartLoop() {
 	kill := make(chan os.Signal, 1)
 
 	// Listen for os.Kill
-	signal.Notify(kill, os.Kill)
+	signal.Notify(kill, os.Kill, os.Interrupt)
 
 	select {
 	case <-kill:
