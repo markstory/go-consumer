@@ -11,15 +11,18 @@ func main() {
 
 	c, err := consumer.Create(*ini)
 	if err != nil {
-		log.Fatalf("Unable to create consumer: Error: %v", err)
+		log.Fatalf("Unable to create consumer. Error: %v", err)
 	}
-	c.Consume(worker)
+	err = c.Consume(worker)
+	if err != nil {
+		log.Fatalf("Unable to consume messages. Error: %v", err)
+	}
 }
 
 // Example worker function
 // Should eventually get type coming out of consumer
 // instead of an amqp.Delivery value.
 func worker (msg *consumer.Message) {
-	log.Printf("msg received")
+	log.Printf("msg received %s", msg)
 	msg.Ack(true)
 }
