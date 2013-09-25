@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"syscall"
 )
 
 // Create the amqp:// url from the config file.
@@ -175,17 +176,26 @@ func (c *Consumer) process(handler worker, messages <-chan amqp.Delivery) {
 }
 
 /*
-Start the loop that keeps the process alive and listening to OS signals.
+Start the loop that keeps the process alive.
+
+Registers signal handlers to cancel consumers, on
+signals.
 */
 func (c *Consumer) StartLoop() {
 	kill := make(chan os.Signal, 1)
 
-	// Listen for os.Kill
-	signal.Notify(kill, os.Kill, os.Interrupt)
-
+	// Listen for common kill types
+	signal.Notify(kill, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
 	select {
-	case <-kill:
-		log.Fatal("Process killed")
+	case s := <-kill:
+		log.Printf("Caught signal %s Stopping consumer.", s)
+		channel, _ := c.conn.Channel()
+		err := channel.Cancel(c.queue.Tag(), false)
+		if err != nil {
+			log.Fatalf("Could not close channel.")
+		}
+		c.conn.Close()
+		log.Print("Channel closed.")
 	}
 }
 
