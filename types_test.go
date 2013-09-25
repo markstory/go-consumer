@@ -141,6 +141,9 @@ exclusive = false
 	if q.name != "test" {
 		t.Error("name does not match")
 	}
+	if q.Name() != "test" {
+		t.Error("name method is wrong.")
+	}
 	if q.durable != false {
 		t.Error("durable is wrong")
 	}
@@ -152,5 +155,8 @@ exclusive = false
 	}
 	if q.routingKey != "fire" {
 		t.Error("routingKey is wrong")
+	}
+	if q.Tag() != "test-fire" {
+		t.Error("tagname is wrong.")
 	}
 }
