@@ -60,5 +60,5 @@ or nacked as you see fit.
 
 ## Signals
 
-GoConsumer handles SIGKILL and SIGQUIT. In both cases the process will be terminated
-once the client buffers have drained and message processing is complete.
+GoConsumer handles SIGINT, SIGTERM and SIGQUIT. In all cases the it attempts to shutdown
+the AMQP connection and finish consuming any buffered messages.
