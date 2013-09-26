@@ -21,9 +21,8 @@ func main() {
 }
 
 // Example worker function
-// Should eventually get type coming out of consumer
-// instead of an amqp.Delivery value.
-func worker (msg *consumer.Message) {
+// Just prints to the logs and sleeps between receiving messages.
+func worker(msg *consumer.Message) {
 	log.Printf("msg received %s", msg.Body)
 	msg.Ack(true)
 	time.Sleep(2000 * time.Millisecond)
