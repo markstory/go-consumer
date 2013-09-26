@@ -12,6 +12,11 @@ type exchange struct {
 	autoDelete bool
 }
 
+func (e exchange) String() string {
+	return fmt.Sprintf("%#v", e)
+}
+
+
 type queue struct {
 	name       string
 	durable    bool
@@ -30,6 +35,10 @@ func (q *queue) Tag() string {
 
 func (q *queue) Exclusive() bool {
 	return q.exclusive
+}
+
+func (q queue) String() string {
+	return fmt.Sprintf("%#v", q)
 }
 
 

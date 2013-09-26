@@ -83,7 +83,6 @@ func Create(configFile string) (c *Consumer, err error) {
 	c = &Consumer{
 		conf: config,
 	}
-
 	return
 }
 
