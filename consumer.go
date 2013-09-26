@@ -115,9 +115,9 @@ Connect to the AMQP server.
 
 Will do the following work:
 
-- Create the connection
-- Declare the exhange
-- Declare the queue
+- Create the connection.
+- Declare the exchange.
+- Declare the queue.
 - Bind the queue + exchange together.
 */
 func (c *Consumer) Connect() (err error) {
