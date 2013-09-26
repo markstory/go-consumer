@@ -4,6 +4,7 @@ import (
 	"consumer"
 	"flag"
 	"log"
+	"time"
 )
 
 func main() {
@@ -23,6 +24,8 @@ func main() {
 // Should eventually get type coming out of consumer
 // instead of an amqp.Delivery value.
 func worker (msg *consumer.Message) {
-	log.Printf("msg received %s", msg)
+	log.Printf("msg received %s", msg.Body)
 	msg.Ack(true)
+	time.Sleep(2000 * time.Millisecond)
+	log.Print("woke up")
 }
