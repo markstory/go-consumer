@@ -188,16 +188,26 @@ func (c *Consumer) StartLoop() {
 	select {
 	case s := <-kill:
 		log.Printf("Caught signal %s Stopping consumer.", s)
-		channel, _ := c.conn.Channel()
-		err := channel.Cancel(c.queue.Tag(), false)
+		err := c.Stop()
 		if err != nil {
 			log.Fatalf("Could not close channel.")
 		}
-		c.conn.Close()
 		log.Print("Channel closed.")
 	}
 }
 
+/*
+Disconnect from the AMQP server and stop consuming messages.
+*/
+func (c *Consumer) Stop() error {
+	channel, _ := c.conn.Channel()
+	err := channel.Cancel(c.queue.Tag(), false)
+	if err != nil {
+		return err
+	}
+	c.conn.Close()
+	return nil
+}
 
 /*
 Simple message type so users of this library don't have to import amqp as well
