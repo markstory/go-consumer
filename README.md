@@ -7,8 +7,6 @@ those together allowing you to focus on writing great consumer code.
 
 This project borrows many ideas from [sparkplug](https://pypi.python.org/pypi/sparkplug/1.4)
 
-*Note* This library is incomplete.
-
 ## Configuration
 
 Configuration is done through an ini style file. In this file you define the connection,
