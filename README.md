@@ -11,7 +11,7 @@ This project borrows many ideas from [sparkplug](https://pypi.python.org/pypi/sp
 
 Configuration is done through an ini style file. In this file you define the connection,
 exchange and queue(s) you want to bind into. Once your file has been loaded and parsed you
-can attach your consumer function in. The following is an example config file:
+can attach your consumer function in. The following is an simple configuration file:
 
 	[connection]
 	host = localhost
@@ -32,6 +32,46 @@ can attach your consumer function in. The following is an example config file:
 	auto_delete = True
 	exclusive = False
 	routing_key = fire
+
+You can also configure your consumer to draw from multiple queues as well:
+
+	[connection]
+	host = localhost
+	virtual_host = '/'
+	user = guest
+	password = guest
+	ssl = False
+
+	[exchange-app]
+	name = app
+	type = direct
+	durable = True
+	auto_delete = False
+
+	[queue-app]
+	name = app
+	durable = True
+	auto_delete = True
+	exclusive = False
+	routing_key = app-event
+
+	[exchange-backend]
+	name = backend
+	type = direct
+	durable = True
+	auto_delete = False
+
+	[queue-backend]
+	name = backend
+	durable = True
+	auto_delete = True
+	exclusive = False
+	routing_key = backend-event
+
+When multiple queues are being bound, each `exchange` and `queue` section should be suffixed
+with the same value. This defines the binding between the exchange and queue.
+
+## Consumers
 
 Consuming functions need to have the following signature:
 
