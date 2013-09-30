@@ -5,6 +5,24 @@ import (
 	"fmt"
 )
 
+type connection struct {
+	host     string
+	vhost    string
+	user     string
+	password string
+	port     int
+}
+
+// Get the AMQP connection URL
+func (c *connection) Url() string {
+	return ""
+}
+
+func (c connection) String() string {
+	return fmt.Sprintf("%#v", c)
+}
+
+
 type exchange struct {
 	name       string
 	kind       string
@@ -53,6 +71,38 @@ func readConfigFile(config *conf.ConfigFile) (ex exchange, q queue, err error) {
 	q, err = newQueue(config)
 	if err != nil {
 		return
+	}
+	return
+}
+
+/*
+Create a new connection struct from the config file data.
+*/
+func newConnection(config *conf.ConfigFile) (c *connection, err error) {
+	if !config.HasSection("connection") {
+		return c, fmt.Errorf("Missing connection section in configuration file.")
+	}
+	c = &connection{
+		host:     "localhost",
+		vhost:    "/",
+		user:     "guest",
+		password: "guest",
+		port:     5672,
+	}
+	if config.HasOption("connection", "host") {
+		c.host, _ = config.GetString("connection", "host")
+	}
+	if config.HasOption("connection", "vhost") {
+		c.vhost, _ = config.GetString("connection", "vhost")
+	}
+	if config.HasOption("connection", "user") {
+		c.user, _ = config.GetString("connection", "user")
+	}
+	if config.HasOption("connection", "password") {
+		c.password, _ = config.GetString("connection", "password")
+	}
+	if config.HasOption("connection", "port") {
+		c.port, _ = config.GetInt("connection", "port")
 	}
 	return
 }

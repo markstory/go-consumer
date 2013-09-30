@@ -160,3 +160,70 @@ exclusive = false
 		t.Error("tagname is wrong.")
 	}
 }
+
+func TestNewConnectionErrorOnMissingSection(t *testing.T) {
+	ini := ""
+	conf := newConfig(ini)
+	_, err := newConnection(conf)
+	if err == nil {
+		t.Error("Error should not be nil")
+	}
+}
+
+func TestNewConnectionDefaults(t *testing.T) {
+	ini := `
+[connection]
+name = test
+`
+	conf := newConfig(ini)
+	c, err := newConnection(conf)
+	if err != nil {
+		t.Error("Should not make an error")
+	}
+	if c.host != "localhost" {
+		t.Error("Invalid default")
+	}
+	if c.vhost != "/" {
+		t.Error("Invalid default")
+	}
+	if c.user != "guest" {
+		t.Error("Invalid default")
+	}
+	if c.password != "guest" {
+		t.Error("Invalid default")
+	}
+	if c.port != 5672 {
+		t.Error("Invalid default")
+	}
+}
+
+func TestNewConnection(t *testing.T) {
+	ini := `
+[connection]
+host = queue-server
+vhost = /app
+user = mark
+password = sekret
+port = 9000
+`
+	conf := newConfig(ini)
+	c, err := newConnection(conf)
+	if err != nil {
+		t.Error("Should not make an error")
+	}
+	if c.host != "queue-server" {
+		t.Error("Invalid value")
+	}
+	if c.vhost != "/app" {
+		t.Error("Invalid value")
+	}
+	if c.user != "mark" {
+		t.Error("Invalid value")
+	}
+	if c.password != "sekret" {
+		t.Error("Invalid value")
+	}
+	if c.port != 9000 {
+		t.Error("Invalid value")
+	}
+}
