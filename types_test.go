@@ -12,7 +12,7 @@ func newConfig(content string) (*conf.ConfigFile) {
 
 func TestNewExchangeError(t *testing.T) {
 	c := newConfig("")
-	_, err := newExchange(c)
+	_, err := newExchange(c, "exchange")
 	if err == nil {
 		t.Error("Missing exchange section should cause an error.")
 	}
@@ -23,7 +23,7 @@ func TestNewExchangeNoNameError(t *testing.T) {
 [exchange]
 `
 	c := newConfig(ini)
-	_, err := newExchange(c)
+	_, err := newExchange(c, "exchange")
 	if err == nil {
 		t.Error("Should fail on missing name.")
 	}
@@ -35,7 +35,7 @@ func TestNewExchangeDefaults(t *testing.T) {
 name = test
 `
 	c := newConfig(ini)
-	ex, err := newExchange(c)
+	ex, err := newExchange(c, "exchange")
 	if err != nil {
 		t.Error("Should not make an error")
 	}
@@ -62,7 +62,7 @@ durable = false
 auto_delete = true
 `
 	c := newConfig(ini)
-	ex, err := newExchange(c)
+	ex, err := newExchange(c, "exchange")
 	if err != nil {
 		t.Error("Should not make an error")
 	}
@@ -83,7 +83,7 @@ auto_delete = true
 
 func TestNewQueueError(t *testing.T) {
 	c := newConfig("")
-	_, err := newQueue(c)
+	_, err := newQueue(c, "queue")
 	if err == nil {
 		t.Error("Missing queue section should cause an error.")
 	}
@@ -94,7 +94,7 @@ func TestNewQueueNoNameError(t *testing.T) {
 [queue]
 `
 	c := newConfig(ini)
-	_, err := newQueue(c)
+	_, err := newQueue(c, "queue")
 	if err == nil {
 		t.Error("Should fail on missing name.")
 	}
@@ -106,7 +106,7 @@ func TestNewQueueDefaults(t *testing.T) {
 name = test
 `
 	c := newConfig(ini)
-	q, err := newQueue(c)
+	q, err := newQueue(c, "queue")
 	if err != nil {
 		t.Error("Should not make an error")
 	}
@@ -134,7 +134,7 @@ routing_key = fire
 exclusive = false
 `
 	c := newConfig(ini)
-	q, err := newQueue(c)
+	q, err := newQueue(c, "queue")
 	if err != nil {
 		t.Error("Should not make an error")
 	}

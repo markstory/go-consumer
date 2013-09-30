@@ -69,11 +69,11 @@ func (q queue) String() string {
 Convert the configuration file into domain objects
 */
 func readConfigFile(config *conf.ConfigFile) (ex exchange, q queue, err error) {
-	ex, err = newExchange(config)
+	ex, err = newExchange(config, "exchange")
 	if err != nil {
 		return
 	}
-	q, err = newQueue(config)
+	q, err = newQueue(config, "queue")
 	if err != nil {
 		return
 	}
@@ -115,11 +115,11 @@ func newConnection(config *conf.ConfigFile) (c connection, err error) {
 /*
 Create an exchange from the config file.
 */
-func newExchange(config *conf.ConfigFile) (ex exchange, err error) {
-	if !config.HasSection("exchange") {
+func newExchange(config *conf.ConfigFile, section string) (ex exchange, err error) {
+	if !config.HasSection(section) {
 		return ex, fmt.Errorf("Missing exchange section in configuration file.")
 	}
-	if _, err := config.GetString("exchange", "name"); err != nil {
+	if _, err := config.GetString(section, "name"); err != nil {
 		return ex, fmt.Errorf("Missing name from exchange section.")
 	}
 	ex = exchange{
@@ -128,15 +128,15 @@ func newExchange(config *conf.ConfigFile) (ex exchange, err error) {
 		durable: true,
 		autoDelete: false,
 	}
-	ex.name, _ = config.GetString("exchange", "name")
+	ex.name, _ = config.GetString(section, "name")
 	if config.HasOption("exchange", "type") {
-		ex.kind, _ = config.GetString("exchange", "type")
+		ex.kind, _ = config.GetString(section, "type")
 	}
-	if config.HasOption("exchange", "durable") {
-		ex.durable, _ = config.GetBool("exchange", "durable")
+	if config.HasOption(section, "durable") {
+		ex.durable, _ = config.GetBool(section, "durable")
 	}
-	if config.HasOption("exchange", "auto_delete") {
-		ex.autoDelete, _ = config.GetBool("exchange", "auto_delete")
+	if config.HasOption(section, "auto_delete") {
+		ex.autoDelete, _ = config.GetBool(section, "auto_delete")
 	}
 	return
 }
@@ -144,14 +144,14 @@ func newExchange(config *conf.ConfigFile) (ex exchange, err error) {
 /*
 Create a queue from the config file.
 */
-func newQueue(config *conf.ConfigFile) (q queue, err error) {
-	if !config.HasSection("queue") {
+func newQueue(config *conf.ConfigFile, section string) (q queue, err error) {
+	if !config.HasSection(section) {
 		return q, fmt.Errorf("Missing queue section in configuration file.")
 	}
-	if _, err := config.GetString("queue", "name"); err != nil {
+	if _, err := config.GetString(section, "name"); err != nil {
 		return q, fmt.Errorf("Missing name from queue section.")
 	}
-	name, _ := config.GetString("queue", "name")
+	name, _ := config.GetString(section, "name")
 	q = queue{
 		name:       name,
 		durable:    true,
@@ -159,17 +159,17 @@ func newQueue(config *conf.ConfigFile) (q queue, err error) {
 		exclusive:  true,
 		routingKey: "",
 	}
-	if config.HasOption("queue", "durable") {
-		q.durable, _ = config.GetBool("queue", "durable")
+	if config.HasOption(section, "durable") {
+		q.durable, _ = config.GetBool(section, "durable")
 	}
-	if config.HasOption("queue", "auto_delete") {
-		q.autoDelete, _ = config.GetBool("queue", "auto_delete")
+	if config.HasOption(section, "auto_delete") {
+		q.autoDelete, _ = config.GetBool(section, "auto_delete")
 	}
-	if config.HasOption("queue", "exclusive") {
-		q.exclusive, _ = config.GetBool("queue", "exclusive")
+	if config.HasOption(section, "exclusive") {
+		q.exclusive, _ = config.GetBool(section, "exclusive")
 	}
-	if config.HasOption("queue", "routing_key") {
-		q.routingKey, _ = config.GetString("queue", "routing_key")
+	if config.HasOption(section, "routing_key") {
+		q.routingKey, _ = config.GetString(section, "routing_key")
 	}
 	return
 }

@@ -2,10 +2,13 @@ package consumer
 
 import (
 	"code.google.com/p/goconf/conf"
+	"fmt"
+	"sort"
+	"strings"
 )
 
 type topology struct {
-	conn connection
+	conn     connection
 	bindings []binding
 }
 
@@ -18,7 +21,6 @@ func (t *topology) Bindings() []binding {
 }
 
 type binding struct {
-	name     string
 	exchange exchange
 	queue    queue
 }
@@ -37,8 +39,57 @@ func NewTopology(config *conf.ConfigFile) (t topology, err error) {
 	if err != nil {
 		return
 	}
-	var binds []binding
+	sections := config.GetSections()
+	sort.Strings(sections)
+
+	count, err := checkSections(sections)
+	if err != nil {
+		return
+	}
+
+	var (
+		binds []binding
+		queues []queue
+		exchanges []exchange
+	)
+
+	for _, section := range sections {
+		if strings.HasPrefix(section, "queue") {
+			q, _ := newQueue(config, section)
+			queues = append(queues, q)
+		}
+		if strings.HasPrefix(section, "exchange") {
+			ex, _ := newExchange(config, section)
+			exchanges = append(exchanges, ex)
+		}
+	}
+
+	for i := 0; i < count; i++ {
+		bind := binding{
+			exchange: exchanges[i],
+			queue: queues[i],
+		}
+		binds = append(binds, bind)
+	}
 
 	t = topology{conn: conn, bindings: binds}
 	return
+}
+
+func checkSections(sections []string) (int, error) {
+	qCount := 0
+	exCount := 0
+	for _, section := range sections {
+		if strings.HasPrefix(section, "queue") {
+			qCount += 1
+		}
+		if strings.HasPrefix(section, "exchange") {
+			exCount += 1
+		}
+	}
+	var err error
+	if qCount != exCount {
+		err = fmt.Errorf("Exchange and Queue sections do not match.")
+	}
+	return qCount, err
 }
