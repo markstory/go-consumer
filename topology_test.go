@@ -92,7 +92,6 @@ func TestNewTopologyWithMultipleQueue(t *testing.T) {
 		t.Error("Incorrect name for first exchange.")
 	}
 
-	t.Log(bindings[1])
 	if bindings[1].queue.name != "front-events" {
 		t.Error("Incorrect name for second queue.")
 	}
@@ -104,10 +103,53 @@ func TestNewTopologyWithMultipleQueue(t *testing.T) {
 	}
 }
 
+
+const unmatchedQueue = `
+[connection]
+host = localhost
+
+[queue-front]
+name = front-events
+routing_key = events
+
+[queue-back]
+name = back-events
+routing_key = events
+
+[exchange-back]
+name = be-events
+type = direct
+`
+
 func TestNewTopologyUnmatchedQueue(t *testing.T) {
-	t.Log("not done")
+	conf := newConfig(unmatchedQueue)
+	_, err := NewTopology(conf)
+	if err == nil {
+		t.Error("Should make an error")
+	}
 }
 
+const unmatchedExchange = `
+[connection]
+host = localhost
+
+[exchange-front]
+name = fe-events
+type = direct
+
+[queue-back]
+name = back-events
+routing_key = events
+
+[exchange-back]
+name = be-events
+type = direct
+`
+
 func TestNewTopologyUnmatchedExchange(t *testing.T) {
-	t.Log("not done")
+	conf := newConfig(unmatchedExchange)
+	_, err := NewTopology(conf)
+	if err == nil {
+		t.Error("Should make an error")
+	}
 }

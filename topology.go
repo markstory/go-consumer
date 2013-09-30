@@ -20,6 +20,7 @@ func (t *topology) Bindings() []binding {
 	return t.bindings
 }
 
+
 type binding struct {
 	exchange exchange
 	queue    queue
