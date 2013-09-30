@@ -26,6 +26,14 @@ type binding struct {
 	queue    queue
 }
 
+func (b *binding) Queue() queue {
+	return b.queue
+}
+
+func (b *binding) Exchange() exchange {
+	return b.exchange
+}
+
 
 /*
 Create a queue topology from a config file
