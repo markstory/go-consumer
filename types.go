@@ -83,11 +83,11 @@ func readConfigFile(config *conf.ConfigFile) (ex exchange, q queue, err error) {
 /*
 Create a new connection struct from the config file data.
 */
-func newConnection(config *conf.ConfigFile) (c *connection, err error) {
+func newConnection(config *conf.ConfigFile) (c connection, err error) {
 	if !config.HasSection("connection") {
 		return c, fmt.Errorf("Missing connection section in configuration file.")
 	}
-	c = &connection{
+	c = connection{
 		host:     "localhost",
 		vhost:    "/",
 		user:     "guest",
