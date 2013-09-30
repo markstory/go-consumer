@@ -15,7 +15,12 @@ type connection struct {
 
 // Get the AMQP connection URL
 func (c *connection) Url() string {
-	return ""
+	return fmt.Sprintf("amqp://%s:%s@%s:%d%s",
+		c.user,
+		c.password,
+		c.host,
+		c.port,
+		c.vhost)
 }
 
 func (c connection) String() string {

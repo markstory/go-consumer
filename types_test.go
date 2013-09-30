@@ -227,3 +227,15 @@ port = 9000
 		t.Error("Invalid value")
 	}
 }
+
+func TestConnectionUrl(t *testing.T) {
+	ini := `
+[connection]
+name = test
+`
+	conf := newConfig(ini)
+	c, _ := newConnection(conf)
+	if c.Url() != "amqp://guest:guest@localhost:5672/" {
+		t.Error("URL with defaults is bad")
+	}
+}
