@@ -122,24 +122,21 @@ func newExchange(config *conf.ConfigFile) (ex exchange, err error) {
 	if _, err := config.GetString("exchange", "name"); err != nil {
 		return ex, fmt.Errorf("Missing name from exchange section.")
 	}
-	name, _ := config.GetString("exchange", "name")
-	kind := "direct"
-	if config.HasOption("exchange", "type") {
-		kind, _ = config.GetString("exchange", "type")
-	}
-	durable := true
-	if config.HasOption("exchange", "durable") {
-		durable, _ = config.GetBool("exchange", "durable")
-	}
-	autoDelete := false
-	if config.HasOption("exchange", "auto_delete") {
-		autoDelete, _ = config.GetBool("exchange", "auto_delete")
-	}
 	ex = exchange{
-		name:       name,
-		kind:       kind,
-		durable:    durable,
-		autoDelete: autoDelete,
+		name: "",
+		kind: "direct",
+		durable: true,
+		autoDelete: false,
+	}
+	ex.name, _ = config.GetString("exchange", "name")
+	if config.HasOption("exchange", "type") {
+		ex.kind, _ = config.GetString("exchange", "type")
+	}
+	if config.HasOption("exchange", "durable") {
+		ex.durable, _ = config.GetBool("exchange", "durable")
+	}
+	if config.HasOption("exchange", "auto_delete") {
+		ex.autoDelete, _ = config.GetBool("exchange", "auto_delete")
 	}
 	return
 }
@@ -155,28 +152,24 @@ func newQueue(config *conf.ConfigFile) (q queue, err error) {
 		return q, fmt.Errorf("Missing name from queue section.")
 	}
 	name, _ := config.GetString("queue", "name")
-	durable := true
-	if config.HasOption("queue", "durable") {
-		durable, _ = config.GetBool("queue", "durable")
-	}
-	autoDelete := false
-	if config.HasOption("queue", "auto_delete") {
-		autoDelete, _ = config.GetBool("queue", "auto_delete")
-	}
-	exclusive := true
-	if config.HasOption("queue", "exclusive") {
-		exclusive, _ = config.GetBool("queue", "exclusive")
-	}
-	routingKey := ""
-	if config.HasOption("queue", "routing_key") {
-		routingKey, _ = config.GetString("queue", "routing_key")
-	}
 	q = queue{
 		name:       name,
-		durable:    durable,
-		autoDelete: autoDelete,
-		exclusive:  exclusive,
-		routingKey: routingKey,
+		durable:    true,
+		autoDelete: false,
+		exclusive:  true,
+		routingKey: "",
+	}
+	if config.HasOption("queue", "durable") {
+		q.durable, _ = config.GetBool("queue", "durable")
+	}
+	if config.HasOption("queue", "auto_delete") {
+		q.autoDelete, _ = config.GetBool("queue", "auto_delete")
+	}
+	if config.HasOption("queue", "exclusive") {
+		q.exclusive, _ = config.GetBool("queue", "exclusive")
+	}
+	if config.HasOption("queue", "routing_key") {
+		q.routingKey, _ = config.GetString("queue", "routing_key")
 	}
 	return
 }
