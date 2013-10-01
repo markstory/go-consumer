@@ -9,6 +9,7 @@ import (
 
 func main() {
 	var ini = flag.String("config", "./simple.ini", "The configuration file to use.")
+	flag.Parse()
 
 	c, err := consumer.Create(*ini)
 	if err != nil {
