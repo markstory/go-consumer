@@ -93,6 +93,12 @@ type Consumer struct {
 	connected bool
 }
 
+/*
+Get the topology struct for the chosen config file.
+
+The topology struct contains the parsed config file data as simple
+structs that can later be traversed to inspect or bind to AMQP.
+*/
 func (c *Consumer) Topology() topology {
 	return c.topology
 }
@@ -102,10 +108,8 @@ Connect to the AMQP server.
 
 Will do the following work:
 
-- Create the connection.
-- Declare the exchange.
-- Declare the queue.
-- Bind the queue + exchange together.
+Create the connection. Declare the exchange.
+Declare the queue. Bind the queue + exchange together.
 */
 func (c *Consumer) Connect() (err error) {
 	if c.connected {
