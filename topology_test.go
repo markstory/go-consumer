@@ -2,6 +2,7 @@ package consumer
 
 import (
 	"testing"
+	"strings"
 )
 
 func TestNewTopologyEmptyConfig(t *testing.T) {
@@ -10,6 +11,9 @@ func TestNewTopologyEmptyConfig(t *testing.T) {
 	_, err := NewTopology(conf)
 	if err == nil {
 		t.Error("should fail, config is empty")
+	}
+	if !strings.Contains(err.Error(), "Missing connection section") {
+		t.Errorf("Error message is wrong. Got %s", err)
 	}
 }
 
@@ -127,6 +131,9 @@ func TestNewTopologyUnmatchedQueue(t *testing.T) {
 	if err == nil {
 		t.Error("Should make an error")
 	}
+	if !strings.Contains(err.Error(), "Exchange and Queue sections") {
+		t.Errorf("Error message is wrong. Got %s", err)
+	}
 }
 
 const unmatchedExchange = `
@@ -151,6 +158,9 @@ func TestNewTopologyUnmatchedExchange(t *testing.T) {
 	_, err := NewTopology(conf)
 	if err == nil {
 		t.Error("Should make an error")
+	}
+	if !strings.Contains(err.Error(), "Exchange and Queue sections") {
+		t.Errorf("Error message is wrong. Got %s", err)
 	}
 }
 
