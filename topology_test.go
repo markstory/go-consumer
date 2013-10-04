@@ -131,7 +131,7 @@ func TestNewTopologyUnmatchedQueue(t *testing.T) {
 	if err == nil {
 		t.Error("Should make an error")
 	}
-	if !strings.Contains(err.Error(), "Exchange and Queue sections") {
+	if !strings.Contains(err.Error(), "Exchange and Queue lengths do not match") {
 		t.Errorf("Error message is wrong. Got %s", err)
 	}
 }
@@ -159,7 +159,7 @@ func TestNewTopologyUnmatchedExchange(t *testing.T) {
 	if err == nil {
 		t.Error("Should make an error")
 	}
-	if !strings.Contains(err.Error(), "Exchange and Queue sections") {
+	if !strings.Contains(err.Error(), "Exchange and Queue lengths do not match") {
 		t.Errorf("Error message is wrong. Got %s", err)
 	}
 }
@@ -182,5 +182,8 @@ func TestNewTopologyMisnamedBits(t *testing.T) {
 	_, err := NewTopology(conf)
 	if err == nil {
 		t.Error("Should make an error")
+	}
+	if !strings.Contains(err.Error(), "Exchange and Queue names do not match") {
+		t.Errorf("Error message is wrong. Got %s", err)
 	}
 }
