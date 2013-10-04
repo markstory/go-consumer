@@ -153,3 +153,24 @@ func TestNewTopologyUnmatchedExchange(t *testing.T) {
 		t.Error("Should make an error")
 	}
 }
+
+const missingBits = `
+[connection]
+host = localhost
+
+[exchange-f]
+name = fe-events
+type = direct
+
+[queue-b]
+name = back-events
+routing_key = events
+`
+
+func TestNewTopologyMisnamedBits(t *testing.T) {
+	conf := newConfig(missingBits)
+	_, err := NewTopology(conf)
+	if err == nil {
+		t.Error("Should make an error")
+	}
+}
