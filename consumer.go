@@ -10,7 +10,7 @@ import (
 )
 
 /*
-Declare the exchange based on the config file.
+* Declare the exchange based on the config file.
 */
 func bind(conn *amqp.Connection, top topology) (err error) {
 	channel, err := conn.Channel()
@@ -26,7 +26,11 @@ func bind(conn *amqp.Connection, top topology) (err error) {
 	return
 }
 
+/*
+*/
 func declare(channel *amqp.Channel, bind binding) (err error) {
+	foo := 9
+	bar := "things"
 	ex := bind.Exchange()
 	log.Printf("Declaring Exchange %s", ex)
 	err = channel.ExchangeDeclare(ex.name, ex.kind, ex.durable, ex.autoDelete, false, false, nil)
