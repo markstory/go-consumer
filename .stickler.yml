@@ -1,5 +1,5 @@
 linters:
-  golanglintci:
+  golangcilint:
 
 fixers:
   enable: true
